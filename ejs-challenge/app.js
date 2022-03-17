@@ -10,35 +10,40 @@ const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui 
 const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
 const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
 
+//initialize exprsess package
 
 const app = express();
 
-let posts = []
-
-
+//usse ejs engine
 app.set('view engine', 'ejs'); //for initializing ejs
 
+//use bodyparser
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//display static files on our public folder
 app.use(express.static("public"));
 
+//initializing mongoose to for crud operation on mongodb
 mongoose.connect('mongodb://localhost:27017/blogDB', { useNewUrlParser: true });
 
+//creating the blogdbschema for structuring files in our database
 const blogDBschema = new mongoose.Schema({
     title: String,
     content: String
 })
 
+//using the blogdbschema to store files on our blogdb
 const blogDB = mongoose.model('blogDB', blogDBschema);
 
 
-
+//getting the home route
 app.get('/', function(req, res) {
     blogDB.find({}, function(err, posts) {
         res.render('home', { para: homeStartingContent, pos: posts })
     })
 
 })
-
+//rendering about,home,contact and compose route
 app.get('/about', function(req, res) {
     res.render('about', { about: aboutContent })
 })
@@ -51,9 +56,12 @@ app.get('/contact', function(req, res) {
     res.render('contact', { contact: contactContent })
 })
 
+//rendering the compose route 
 app.get('/compose', function(req, res) {
     res.render('compose')
 })
+
+//sending post from the compose route to /home route
 app.post('/compose', function(req, res) {
 
     const composedb = new blogDB({
@@ -73,6 +81,7 @@ app.post('/compose', function(req, res) {
 
 })
 
+//posting dynamic data
 app.get('/post/:userid', function(req, res) {
 
     const mypost = (req.params.userid)
